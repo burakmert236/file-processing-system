@@ -6,15 +6,12 @@ import (
 	"os"
 	"os/signal"
 
-	"github.com/burakmert236/file-processing-system/file-upload/app"
+	app "github.com/burakmert236/file-processing-system/file-upload/app"
+	utils "github.com/burakmert236/file-processing-system/internal/utils"
 )
 
 func main() {
-	port := os.Getenv("PORT")
-
-	if port == "" {
-		log.Fatal("PORT env variable is required")
-	}
+	port := utils.GetEnv("PORT", true)
 
 	app.InitNATS()
 	defer app.CloseNATS()

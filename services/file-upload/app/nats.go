@@ -4,10 +4,8 @@ import natsconn "github.com/burakmert236/file-processing-system/internal/nats_cl
 
 var NATS *natsconn.NATS
 
-const subjectName string = "file-uploads"
-
 func InitNATS() {
-	NATS = natsconn.InitNats([]string{subjectName})
+	NATS = natsconn.InitNats()
 }
 
 func CloseNATS() {

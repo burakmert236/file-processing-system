@@ -23,8 +23,12 @@ services:
     environment:
       - NATS_URL=nats://nats:4222
       - PORT=8010
+      - UPLOADS_FOLDER=/tmp/uploads
     ports:
       - "8010:8010"
+    volumes:
+      - uploads:/tmp/uploads
 
 volumes:
   nats-data:
+  uploads:
