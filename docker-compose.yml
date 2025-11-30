@@ -1,33 +1,30 @@
 services:
-  # --- Infrastructure ---
-  zookeeper:
-    image: confluentinc/cp-zookeeper:7.5.0
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-
-  kafka:
-    image: confluentinc/cp-kafka:7.5.0
-    depends_on:
-      - zookeeper
+  # Infrastructure
+  nats:
+    container_name: nats
+    image: nats:2.10
     ports:
-      - "9092:9092"
-      - "29092:29092"
-    environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,PLAINTEXT_HOST://0.0.0.0:29092
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
-      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-
-  schema-registry:
-    image: confluentinc/cp-schema-registry:7.5.0
+      - "4222:4222"
+      - "8222:8222"
+    command: ["-js", "-c", "/etc/nats/nats.conf"]
+    volumes:
+      - ./internal/nats_client/nats.conf:/etc/nats/nats.conf
+      - nats-data:/data
+    restart: unless-stopped
+  
+  # Microservices
+  file-upload:
+    container_name: file-upload
+    build: 
+      context: .
+      dockerfile: ./services/file-upload/Dockerfile
     depends_on:
-      - kafka
-    ports:
-      - "8081:8081"
+      - nats
     environment:
-      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: PLAINTEXT://kafka:9092
-      SCHEMA_REGISTRY_HOST_NAME: schema-registry
-      SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
+      - NATS_URL=nats://nats:4222
+      - PORT=8010
+    ports:
+      - "8010:8010"
+
+volumes:
+  nats-data:

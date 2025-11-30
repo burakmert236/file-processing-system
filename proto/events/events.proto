@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package events;
+
+option go_package = "github.com/burakmert236/file-processing-system/generated/events";
+
+import "common/common.proto";
+
+message FileUploaded {
+    common.FileRef file = 1;
+    string temp_path = 2;
+}

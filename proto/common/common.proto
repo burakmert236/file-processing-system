@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package common;
+
+option go_package = "github.com/burakmert236/file-processing-system/generated/common";
+
+message FileRef {
+    string file_id = 1;
+    string user_id = 2;
+    string file_name = 3;
+}
