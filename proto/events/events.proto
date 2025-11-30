@@ -10,3 +10,12 @@ message FileUploaded {
     common.FileRef file = 1;
     string temp_path = 2;
 }
+
+message FileValidated {
+    common.FileRef file = 1;
+}
+
+message FileValidationFailed {
+    common.FileRef file = 1;
+    string message = 2;
+}

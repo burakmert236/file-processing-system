@@ -7,9 +7,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/burakmert236/file-processing-system/generated/common"
-	events "github.com/burakmert236/file-processing-system/generated/events"
-	"github.com/burakmert236/file-processing-system/internal/nats_client"
 	utils "github.com/burakmert236/file-processing-system/internal/utils"
 )
 
@@ -25,26 +22,18 @@ func HandleUpload(w http.ResponseWriter, req *http.Request) {
 
 	userId := req.PathValue("userId")
 	fileName := strings.Split(header.Filename, ".")[0]
-	fileId := fmt.Sprintf("%s-%d", fileName, time.Now().Nanosecond())
+	extension := strings.Split(header.Filename, ".")[1]
+	fileId := fmt.Sprintf("%s-%d.%s", fileName, time.Now().Nanosecond(), extension)
 	folder := fmt.Sprintf("%s/%s", uploadsFolder, userId)
 	tempPath := fmt.Sprintf("%s/%s", folder, fileId)
 
-	storeError := utils.StoreFile(folder, fileName, file)
+	storeError := utils.StoreFile(folder, fileId, file)
 	if storeError != nil {
 		http.Error(w, "Cannot store file: "+storeError.Error(), 500)
 		return
 	}
 
-	event := &events.FileUploaded{
-		File: &common.FileRef{
-			FileId:   fileId,
-			UserId:   userId,
-			FileName: fileName,
-		},
-		TempPath: tempPath,
-	}
-
-	publishError := NATS.Publish(nats_client.FileUplaoded.String(), event)
+	publishError := PublishFileUploaded(fileId, userId, fileName, tempPath)
 	if publishError != nil {
 		http.Error(w, "Publish error: "+publishError.Error(), 500)
 		return

@@ -5,6 +5,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"os/signal"
 )
 
 func GetEnv(varName string, isRequired bool) string {
@@ -30,4 +31,12 @@ func StoreFile(folder string, fileName string, file io.Reader) error {
 
 	io.Copy(dst, file)
 	return nil
+}
+
+func WaitForGracefulShutdown() {
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
+	<-c
+
+	log.Println("Shutting down...")
 }

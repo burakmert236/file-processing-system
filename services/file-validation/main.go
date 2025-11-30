@@ -1,7 +1,7 @@
 package main
 
 import (
-	app "github.com/burakmert236/file-processing-system/file-upload/app"
+	"github.com/burakmert236/file-processing-system/file-validation/app"
 	utils "github.com/burakmert236/file-processing-system/internal/utils"
 )
 
